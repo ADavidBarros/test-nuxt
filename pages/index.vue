@@ -12,23 +12,28 @@
 </template>
 <script>
   import EventCard from '~/components/EventCard'
-
+  import EventService from '~/services/EventService'
   export default {
     components: { EventCard },
-    asyncData({ $axios, error }) {
-      return $axios
-        .get('http://localhost:3001/events')
-        .then((response) => {
-          return {
-            events: response.data
-          }
+    async asyncData({ error }) {
+      try {
+        const response = await EventService.getEvents()
+        return {
+          events: response.data
+        }
+      } catch (e) {
+        error({
+          statusCode: 503,
+          message: 'Unable to fetch events at this time, Please try later'
         })
-        .catch((e) => {
-          error({
-            statusCode: 503,
-            message: 'Unable to fetch events at this time, Please try later'
-          })
-        })
+      }
+
+      // .catch((e) => {
+      //   error({
+      //     statusCode: 503,
+      //     message: 'Unable to fetch events at this time, Please try later'
+      //   })
+      // })
     },
 
     head() {

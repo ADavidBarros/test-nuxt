@@ -1,13 +1,29 @@
 <template>
   <div>
-    <h1>Event # {{ id }}</h1>
+    <h1>Event # {{ event.title }}</h1>
   </div>
 </template>
 <script>
+  import EventService from '~/services/EventService'
+
   export default {
+    async asyncData({ error, params }) {
+      try {
+        const response = await EventService.getEvent(params.id)
+        return {
+          event: response.data
+        }
+      } catch (e) {
+        error({
+          statusCode: 503,
+          message: 'Unable to fetch events  ' + params.id + '  Please try later'
+        })
+      }
+    },
+
     head() {
       return {
-        title: 'Event #' + this.id,
+        title: 'Event #' + this.event.title,
         meta: [
           {
             hid: 'description',
@@ -15,11 +31,6 @@
             content: 'Information about your event #' + this.id
           }
         ]
-      }
-    },
-    computed: {
-      id() {
-        return this.$route.params.id
       }
     }
   }
